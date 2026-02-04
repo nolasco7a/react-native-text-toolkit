@@ -5,3 +5,4 @@ export { TextLink } from "./text-link";
 export type { TextLinkProps } from "./text-link";
 
 export { TextToolkit } from "./text-toolkit";
+export type { TextToolkitProps } from "./text-toolkit";

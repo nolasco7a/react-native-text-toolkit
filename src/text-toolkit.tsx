@@ -1,12 +1,13 @@
 import React from "react";
-import { Text } from "./text";
+import { Text as RNText } from "react-native";
+import { Text, TextProps } from "./text";
 import { TextLink, TextLinkProps } from "./text-link";
 
 type LinksMapping = {
   [key: string]: TextLinkProps;
 };
 
-interface TextToolkitProps {
+export interface TextToolkitProps extends Omit<TextProps, "text" | "onPress"> {
   text: string;
   links: LinksMapping;
 };
@@ -35,7 +36,7 @@ interface TextToolkitProps {
  *   }}
  * />
  */
-export const TextToolkit = ({ text, links }: TextToolkitProps) => {
+export const TextToolkit = ({ text, links, ...textProps }: TextToolkitProps) => {
   // RegEx to split on {tag}, capturing the tag names
   const pattern = /\{([^}]+)\}/g;
 
@@ -53,7 +54,7 @@ export const TextToolkit = ({ text, links }: TextToolkitProps) => {
     if (match.index > lastIndex) {
       const before = text.slice(lastIndex, match.index);
       elements.push(
-        <Text key={`text-${idx}`} text={before} />
+        <Text key={`text-${idx}`} text={before} {...textProps} />
       );
       idx++;
     }
@@ -70,7 +71,7 @@ export const TextToolkit = ({ text, links }: TextToolkitProps) => {
             text={linkConfig.text}
             type={linkConfig.type}
             value={undefined as never}
-            linkStyle={linkConfig.linkStyle}
+            style={linkConfig.style}
           />
         );
       } else {
@@ -80,14 +81,14 @@ export const TextToolkit = ({ text, links }: TextToolkitProps) => {
             text={linkConfig.text}
             type={linkConfig.type}
             value={linkConfig.value}
-            linkStyle={linkConfig.linkStyle}
+            style={linkConfig.style}
           />
         );
       }
     } else {
       // If the tag is not found, show as plain text with braces
       elements.push(
-        <Text key={`text-${idx}`} text={`{${tag}}`} />
+        <Text key={`text-${idx}`} text={`{${tag}}`} {...textProps} />
       );
     }
     idx++;
@@ -97,11 +98,11 @@ export const TextToolkit = ({ text, links }: TextToolkitProps) => {
   // Add any remaining text after last tag
   if (lastIndex < text.length) {
     elements.push(
-      <Text key={`text-${idx}`} text={text.slice(lastIndex)} />
+      <Text key={`text-${idx}`} text={text.slice(lastIndex)} {...textProps} />
     );
   }
 
-  // In React Native, <Text> children must be wrapped in a single parent <Text>
-  return <Text text={elements}/>;
+  // Plain RNText wrapper avoids theme color cascading to links
+  return <RNText style={textProps.style}>{elements}</RNText>;
 };
 

@@ -1,5 +1,5 @@
-import { Text, TextProps } from "./text";
-import { Alert, Linking } from "react-native";
+import { Text } from "./text";
+import { Linking, StyleProp, TextStyle } from "react-native";
 
 export type TextLinkProps = {
   /** The key of the link */
@@ -11,13 +11,7 @@ export type TextLinkProps = {
   /** The value of the link */
   value?: string;
   /** The style of the link */
-  linkStyle?: {
-    size?: TextProps["size"];
-    weight?: TextProps["weight"];
-    decoration?: TextProps["decoration"];
-    transform?: TextProps["transform"];
-    color?: string;
-  }
+  style?: StyleProp<TextStyle>;
 } & (
       | {
       type: "email" | "phone" | "url" | "sms";
@@ -58,12 +52,7 @@ export const TextLink = ({
   text,
   type,
   value,
-  linkStyle = {
-   size: "medium",
-   weight: "bold",
-   decoration: "underline",
-   transform: "none",
-  }
+  style,
 }: TextLinkProps) => {
 
   const handleOpenSettings = async () => {
@@ -124,5 +113,17 @@ export const TextLink = ({
     }
   };
 
-  return  <Text onPress={() => handleAction(type)} style={{ color: linkStyle.color ?? "blue", padding: 0, margin: 0 }} text={text} size={linkStyle.size} weight={linkStyle.weight} decoration={linkStyle.decoration} transform={linkStyle.transform} />
+  return (
+    <Text
+      onPress={() => handleAction(type)}
+      style={[defaultLinkStyle, style]}
+      text={text}
+    />
+  );
+};
+
+const defaultLinkStyle: TextStyle = {
+  fontWeight: "bold",
+  textDecorationLine: "none",
+  color: "#3366CC",
 };

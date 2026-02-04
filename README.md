@@ -5,17 +5,18 @@ A powerful and flexible text component library for React Native that supports in
 ## Installation
 
 ```bash
-npm install react-native-text-toolkit
+npm install @nolasco7a/react-native-text-toolkit
 # or
-yarn add react-native-text-toolkit
+yarn add @nolasco7a/react-native-text-toolkit
 ```
+
 ## Features
 
-✨ Automatic dark/light theme detection
-📝 Inline text formatting (bold, italic, strikethrough, underline)
-🔗 Inline clickable links with template syntax
-🎨 Highly customizable
-📱 TypeScript support
+- Automatic dark/light theme detection
+- Inline text formatting (bold, italic, strikethrough, underline)
+- Inline clickable links with template syntax
+- Full styling via React Native's `style` prop — no arbitrary abstractions
+- TypeScript support
 
 ## Components
 
@@ -39,7 +40,7 @@ The `Text` component supports inline markup using a simple syntax:
 ### Basic Usage
 
 ```tsx
-import { Text } from 'react-native-text-toolkit';
+import { Text } from '@nolasco7a/react-native-text-toolkit';
 
 // Bold text
 <Text text="This is a {**bold**} word in a sentence." />
@@ -57,62 +58,43 @@ import { Text } from 'react-native-text-toolkit';
 <Text text="Mix {**bold**}, {!!italic!!}, {~~strikethrough~~} and {__underline__} in one text." />
 ```
 
-### Text Sizes
+### Styling
+
+All styling is done through React Native's standard `style` prop. No arbitrary presets — you have full control.
 
 ```tsx
-<Text text="Small text" size="small" />
-<Text text="Regular text" size="regular" />
-<Text text="Medium text" size="medium" />
-<Text text="Large text" size="large" />
-<Text text="Extra large text" size="xlarge" />
+<Text
+  text="Large bold centered text"
+  style={{ fontSize: 24, fontWeight: "bold", textAlign: "center" }}
+/>
+
+<Text
+  text="Custom styled text"
+  style={{ fontSize: 14, fontWeight: "300", textTransform: "uppercase", letterSpacing: 2 }}
+/>
 ```
 
-Available sizes: `small` | `regular` | `medium` | `large` | `xlarge` | `x2large` | `x3large` | `x4large` | `x5large`
+### Theme-aware Colors
 
-### Text Weights
+Automatically adapts text color based on the device's color scheme using `useColorScheme()`.
 
 ```tsx
-<Text text="Light weight" weight="light" />
-<Text text="Normal weight" weight="normal" />
-<Text text="Bold weight" weight="bold" />
-<Text text="Black weight" weight="black" />
+<Text
+  text="I adapt to the theme"
+  themeTextColors={{ light: "#222222", dark: "#EEEEEE" }}
+/>
 ```
 
-Available weights: `thin` | `extraLight` | `light` | `normal` | `bold` | `extraBold` | `black`
-
-### Text Decorations
-
-```tsx
-<Text text="Underlined text" decoration="underline" />
-<Text text="Strikethrough text" decoration="strikethrough" />
-```
-
-Available decorations: `none` | `underline` | `strikethrough`
-
-### Text Transforms
-
-```tsx
-<Text text="uppercase text" transform="uppercase" />
-<Text text="LOWERCASE TEXT" transform="lowercase" />
-<Text text="capitalized text" transform="capitalize" />
-```
-
-Available transforms: `none` | `uppercase` | `lowercase` | `capitalize`
+Without `themeTextColors`, the text defaults to `#000000` in light mode and `#FFFFFF` in dark mode.
 
 ### Text Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `text` | `string \| React.ReactNode` | - | The text to display |
-| `size` | `string` | `"medium"` | Font size preset |
-| `weight` | `string` | `"normal"` | Font weight |
-| `decoration` | `string` | `"none"` | Text decoration |
-| `transform` | `string` | `"none"` | Text transform |
-| `align` | `"left" \| "center" \| "right"` | `"left"` | Text alignment |
-| `fontStyle` | `"regular" \| "italic"` | `"regular"` | Font style |
-| `style` | `StyleProp<TextStyle>` | - | Custom styles |
+| `style` | `StyleProp<TextStyle>` | - | Standard React Native text styles |
 | `onPress` | `() => void` | - | Press handler |
-| `themeTextColors` | `{ light: ColorValue, dark: ColorValue }` | - | Theme-aware colors |
+| `themeTextColors` | `{ light: ColorValue, dark: ColorValue }` | `{ light: "#000000", dark: "#FFFFFF" }` | Theme-aware colors |
 
 ---
 
@@ -123,7 +105,7 @@ The `TextLink` component renders clickable text that can open URLs, emails, phon
 ### Basic Usage
 
 ```tsx
-import { TextLink } from 'react-native-text-toolkit';
+import { TextLink } from '@nolasco7a/react-native-text-toolkit';
 
 // URL link
 <TextLink text="Visit Google" type="url" value="https://google.com" />
@@ -143,17 +125,14 @@ import { TextLink } from 'react-native-text-toolkit';
 
 ### Custom Styled Link
 
+`style` accepts any `StyleProp<TextStyle>`, giving you full control over the link's appearance.
+
 ```tsx
 <TextLink
   text="Custom styled link"
   type="url"
   value="https://github.com"
-  linkStyle={{
-    size: "large",
-    weight: "bold",
-    decoration: "none",
-    color: "#E91E63"
-  }}
+  style={{ fontSize: 20, fontWeight: "900", textDecorationLine: "none", color: "#E91E63" }}
 />
 ```
 
@@ -164,28 +143,18 @@ import { TextLink } from 'react-native-text-toolkit';
 | `text` | `string` | - | The text to display |
 | `type` | `"email" \| "phone" \| "url" \| "sms" \| "settings"` | - | Type of link action |
 | `value` | `string` | - | The link value (not required for `settings`) |
-| `linkStyle` | `object` | - | Custom styling for the link |
-
-#### linkStyle Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `size` | `string` | `"medium"` | Font size preset |
-| `weight` | `string` | `"bold"` | Font weight |
-| `decoration` | `string` | `"underline"` | Text decoration |
-| `transform` | `string` | `"none"` | Text transform |
-| `color` | `string` | `"blue"` | Link color |
+| `style` | `StyleProp<TextStyle>` | `{ fontWeight: "bold", textDecorationLine: "underline", color: "#3366CC" }` | Custom styling for the link |
 
 ---
 
 ## TextToolkit Component
 
-The `TextToolkit` component allows you to embed multiple links within text using `{placeholder}` syntax.
+The `TextToolkit` component allows you to embed multiple links within text using `{placeholder}` syntax. It accepts all `Text` props for styling the text segments, while links maintain their own independent styles.
 
 ### Basic Usage
 
 ```tsx
-import { TextToolkit } from 'react-native-text-toolkit';
+import { TextToolkit } from '@nolasco7a/react-native-text-toolkit';
 
 // Simple link
 <TextToolkit
@@ -213,43 +182,25 @@ import { TextToolkit } from 'react-native-text-toolkit';
 />
 ```
 
-### Custom Styled Links
+### Styled Text with Links
 
 ```tsx
-// Different colored links
-<TextToolkit
-  text="Check out {github} or {twitter} for updates."
-  links={{
-    github: {
-      text: "GitHub",
-      type: "url",
-      value: "https://github.com",
-      linkStyle: { color: "#333", weight: "bold", decoration: "none" }
-    },
-    twitter: {
-      text: "Twitter",
-      type: "url",
-      value: "https://twitter.com",
-      linkStyle: { color: "#1DA1F2", weight: "bold", decoration: "none" }
-    }
-  }}
-/>
-
-// Terms and Privacy links
 <TextToolkit
   text="Read our {terms} and {privacy} before signing up."
+  style={{ fontSize: 16, color: "#333" }}
+  themeTextColors={{ light: "#333", dark: "#CCC" }}
   links={{
     terms: {
       text: "Terms of Service",
       type: "url",
       value: "https://example.com/terms",
-      linkStyle: { color: "#2196F3", decoration: "underline" }
+      style: { color: "#2196F3" }
     },
     privacy: {
       text: "Privacy Policy",
       type: "url",
       value: "https://example.com/privacy",
-      linkStyle: { color: "#4CAF50", decoration: "underline" }
+      style: { color: "#4CAF50" }
     }
   }}
 />
@@ -260,30 +211,31 @@ import { TextToolkit } from 'react-native-text-toolkit';
 ```tsx
 <TextToolkit
   text="Reach out via {email}, {phone}, or {chat}. Check our {faq} for quick answers."
+  style={{ fontSize: 15 }}
   links={{
     email: {
       text: "email",
       type: "email",
       value: "support@example.com",
-      linkStyle: { color: "#E91E63", weight: "bold" }
+      style: { color: "#E91E63", fontWeight: "800" }
     },
     phone: {
       text: "phone",
       type: "phone",
       value: "+1234567890",
-      linkStyle: { color: "#00BCD4", weight: "bold" }
+      style: { color: "#00BCD4", fontWeight: "800" }
     },
     chat: {
       text: "live chat",
       type: "url",
       value: "https://example.com/chat",
-      linkStyle: { color: "#8BC34A", weight: "bold" }
+      style: { color: "#8BC34A", fontWeight: "800" }
     },
     faq: {
       text: "FAQ",
       type: "url",
       value: "https://example.com/faq",
-      linkStyle: { color: "#FF9800", weight: "bold", decoration: "underline" }
+      style: { color: "#FF9800", fontWeight: "800" }
     }
   }}
 />
@@ -293,31 +245,32 @@ import { TextToolkit } from 'react-native-text-toolkit';
 
 ```tsx
 <TextToolkit
-  text="{about} • {blog} • {careers} • {contact}"
+  text="{about} | {blog} | {careers} | {contact}"
+  style={{ fontSize: 12, textAlign: "center" }}
   links={{
     about: {
       text: "About",
       type: "url",
       value: "https://example.com/about",
-      linkStyle: { color: "#757575", size: "small", decoration: "none" }
+      style: { color: "#757575", fontSize: 12, textDecorationLine: "none" }
     },
     blog: {
       text: "Blog",
       type: "url",
       value: "https://example.com/blog",
-      linkStyle: { color: "#757575", size: "small", decoration: "none" }
+      style: { color: "#757575", fontSize: 12, textDecorationLine: "none" }
     },
     careers: {
       text: "Careers",
       type: "url",
       value: "https://example.com/careers",
-      linkStyle: { color: "#757575", size: "small", decoration: "none" }
+      style: { color: "#757575", fontSize: 12, textDecorationLine: "none" }
     },
     contact: {
       text: "Contact",
       type: "url",
       value: "https://example.com/contact",
-      linkStyle: { color: "#757575", size: "small", decoration: "none" }
+      style: { color: "#757575", fontSize: 12, textDecorationLine: "none" }
     }
   }}
 />
@@ -325,10 +278,14 @@ import { TextToolkit } from 'react-native-text-toolkit';
 
 ### TextToolkit Props
 
+Accepts all `Text` props (except `text` and `onPress`) plus:
+
 | Prop | Type | Description |
 |------|------|-------------|
 | `text` | `string` | Text with `{placeholder}` tags for links |
 | `links` | `LinksMapping` | Object mapping placeholder names to link configurations |
+| `style` | `StyleProp<TextStyle>` | Styles applied to all text segments |
+| `themeTextColors` | `{ light: ColorValue, dark: ColorValue }` | Theme-aware colors for text segments |
 
 #### LinksMapping
 
@@ -337,16 +294,10 @@ Each key in the `links` object corresponds to a placeholder in the text. The val
 ```ts
 {
   [placeholderName: string]: {
-    text: string;           // Display text for the link
+    text: string;                  // Display text for the link
     type: "url" | "email" | "phone" | "sms" | "settings";
-    value?: string;         // Link value (not required for "settings")
-    linkStyle?: {           // Optional custom styling
-      size?: string;
-      weight?: string;
-      decoration?: string;
-      transform?: string;
-      color?: string;
-    }
+    value?: string;                // Link value (not required for "settings")
+    style?: StyleProp<TextStyle>;  // Optional custom styling
   }
 }
 ```
