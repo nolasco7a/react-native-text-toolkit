@@ -1,5 +1,7 @@
 # TextLink
 
+![TextLink component screenshot](/screenshots/text-link.png)
+
 The `TextLink` component renders clickable text that can open URLs, emails, phone numbers, SMS, or device settings.
 
 ## Basic Usage

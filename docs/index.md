@@ -27,3 +27,81 @@ features:
   - title: TypeScript first
     details: Every component and prop is fully typed, including the LinksMapping shape for TextToolkit.
 ---
+
+<div class="demo-section">
+
+## See it in action
+
+<div class="demo-grid">
+
+<div class="demo-item">
+
+### [Text](/guide/text)
+
+Inline `{**bold**}`, `{!!italic!!}`, `{~~strikethrough~~}` and `{__underline__}` markup, styled through the standard `style` prop.
+
+<a href="/guide/text"><img src="/screenshots/text.png" alt="Text component screenshot" /></a>
+
+</div>
+
+<div class="demo-item">
+
+### [TextLink](/guide/text-link)
+
+Tappable text for URLs, email, phone, SMS and device settings — each `type` just works out of the box.
+
+<a href="/guide/text-link"><img src="/screenshots/text-link.png" alt="TextLink component screenshot" /></a>
+
+</div>
+
+<div class="demo-item">
+
+### [TextToolkit](/guide/text-toolkit)
+
+Text and multiple independently-styled links combined in one string via `{placeholder}` syntax.
+
+<a href="/guide/text-toolkit"><img src="/screenshots/text-toolkit.png" alt="TextToolkit component screenshot" /></a>
+
+</div>
+
+</div>
+
+</div>
+
+<style>
+.demo-section {
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+.demo-section h2 {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.demo-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 40px;
+}
+@media (min-width: 768px) {
+  .demo-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.demo-item h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  border-top: none;
+  padding-top: 0;
+}
+.demo-item p {
+  color: var(--vp-c-text-2);
+  margin-bottom: 16px;
+}
+.demo-item img {
+  display: block;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--vp-c-divider);
+}
+</style>

@@ -1,5 +1,7 @@
 # TextToolkit
 
+![TextToolkit component screenshot](/screenshots/text-toolkit.png)
+
 The `TextToolkit` component allows you to embed multiple links within text using `{placeholder}` syntax. It accepts all `Text` props for styling the text segments, while links maintain their own independent styles.
 
 ## Basic Usage

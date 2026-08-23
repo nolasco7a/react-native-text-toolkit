@@ -1,5 +1,7 @@
 # Text
 
+![Text component screenshot](/screenshots/text.png)
+
 The `Text` component supports inline markup using a simple syntax:
 
 | Style | Syntax | Example |
