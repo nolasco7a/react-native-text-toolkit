@@ -2,6 +2,8 @@
 
 A powerful and flexible text component library for React Native that supports inline text formatting, clickable links, and combined text with embedded links.
 
+📖 [Full documentation](https://nolasco7a.github.io/react-native-text-toolkit/)
+
 ## Installation
 
 ```bash
