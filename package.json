@@ -7,7 +7,10 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "author": "Allan Nolasco",
   "license": "MIT",
@@ -19,12 +22,14 @@
   "devDependencies": {
     "@types/react": "^19.2.9",
     "@types/react-native": "^0.72.8",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitepress": "^1.6.4"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nolasco7a/react-native-text-toolkit"
+    "url": "git+https://github.com/nolasco7a/react-native-text-toolkit.git"
   },
+  "homepage": "https://nolasco7a.github.io/react-native-text-toolkit/",
   "keywords": [
     "react-native",
     "text",
