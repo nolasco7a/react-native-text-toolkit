@@ -15,6 +15,52 @@ export interface TextProps {
   }
 }
 
+type StyleType = "normal" | "bold" | "italic" | "strikethrough" | "underline";
+
+type Fragment = { type: StyleType; value: string };
+
+const MARKUP = /(\{\*\*(.+?)\*\*\}|\{!!(.+?)!!\}|\{~~(.+?)~~\}|\{__(.+?)__\})/g;
+
+/** Splits markup into styled fragments. Pure, so it can be memoized per string. */
+function parseStyledText(input: string): Fragment[] {
+  const regex = new RegExp(MARKUP.source, "g");
+  const result: Fragment[] = [];
+
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = regex.exec(input)) !== null) {
+    if (match.index > lastIndex) {
+      result.push({ type: "normal", value: input.slice(lastIndex, match.index) });
+    }
+
+    if (match[2]) {
+      result.push({ type: "bold", value: match[2] });
+    } else if (match[3]) {
+      result.push({ type: "italic", value: match[3] });
+    } else if (match[4]) {
+      result.push({ type: "strikethrough", value: match[4] });
+    } else if (match[5]) {
+      result.push({ type: "underline", value: match[5] });
+    }
+
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < input.length) {
+    result.push({ type: "normal", value: input.slice(lastIndex) });
+  }
+  return result;
+}
+
+function getMarkupOverride(activeType: StyleType): TextStyle {
+  switch (activeType) {
+    case "bold": return { fontWeight: "bold" };
+    case "italic": return { fontStyle: "italic" };
+    case "strikethrough": return { textDecorationLine: "line-through" };
+    case "underline": return { textDecorationLine: "underline" };
+    default: return {};
+  }
+}
+
 /**
  * The Text component
  *
@@ -61,8 +107,15 @@ export const Text = ({
     return isDarkMode ? textColors.dark : textColors.light;
   }, [themeTextColors, isDarkMode]);
 
+  // Parsing is the expensive part and depends only on the string, so it is kept
+  // out of the render path for lists that re-render often.
+  const parsed = useMemo(
+    () => (typeof text === "string" ? parseStyledText(text) : null),
+    [text]
+  );
+
   // If text is a ReactNode (not a string), render directly without parsing.
-  if (typeof text !== "string") {
+  if (parsed === null) {
     return (
       <RNText
         onPress={onPress}
@@ -74,55 +127,6 @@ export const Text = ({
     );
   }
 
-  // Parser for bold ({**text**}), italic ({!!text!!}), strikethrough ({~~text~~}), underline ({__text__})
-  type StyleType = "normal" | "bold" | "italic" | "strikethrough" | "underline";
-  function parseStyledText(input: string) {
-    const regex = /(\{\*\*(.+?)\*\*\}|\{!!(.+?)!!\}|\{~~(.+?)~~\}|\{__(.+?)__\})/g;
-    const result: { type: StyleType; value: string }[] = [];
-
-    let lastIndex = 0;
-    let match: RegExpExecArray | null;
-    while ((match = regex.exec(input)) !== null) {
-      if (match.index > lastIndex) {
-        result.push({
-          type: "normal",
-          value: input.slice(lastIndex, match.index),
-        });
-      }
-
-      if (match[2]) {
-        result.push({ type: "bold", value: match[2] });
-      } else if (match[3]) {
-        result.push({ type: "italic", value: match[3] });
-      } else if (match[4]) {
-        result.push({ type: "strikethrough", value: match[4] });
-      } else if (match[5]) {
-        result.push({ type: "underline", value: match[5] });
-      }
-
-      lastIndex = regex.lastIndex;
-    }
-    if (lastIndex < input.length) {
-      result.push({
-        type: "normal",
-        value: input.slice(lastIndex),
-      });
-    }
-    return result;
-  }
-
-  const parsed = parseStyledText(text);
-
-  function getMarkupOverride(activeType: StyleType): TextStyle {
-    switch (activeType) {
-      case "bold": return { fontWeight: "bold" };
-      case "italic": return { fontStyle: "italic" };
-      case "strikethrough": return { textDecorationLine: "line-through" };
-      case "underline": return { textDecorationLine: "underline" };
-      default: return {};
-    }
-  }
-
   return (
     <RNText
       onPress={onPress}
@@ -132,7 +136,7 @@ export const Text = ({
       {parsed.map((frag, i) => (
         <RNText
           key={i}
-          style={[textColor, style as TextStyle, getMarkupOverride(frag.type)]}
+          style={[textColor, style, getMarkupOverride(frag.type)]}
           suppressHighlighting={true}
         >
           {frag.value}

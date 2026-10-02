@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Text as RNText } from "react-native";
 import { Text, TextProps } from "./text";
 import { TextLink, TextLinkProps } from "./text-link";
@@ -11,6 +11,34 @@ export interface TextToolkitProps extends Omit<TextProps, "text" | "onPress"> {
   text: string;
   links: LinksMapping;
 };
+
+type Token =
+  | { kind: "text"; value: string }
+  | { kind: "tag"; name: string };
+
+/**
+ * Splits text on `{tag}` placeholders. Depends only on the string, so it can be
+ * memoized independently of the links mapping, which consumers usually rebuild
+ * on every render.
+ */
+function tokenize(text: string): Token[] {
+  const pattern = /\{([^}]+)\}/g;
+  const tokens: Token[] = [];
+
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      tokens.push({ kind: "text", value: text.slice(lastIndex, match.index) });
+    }
+    tokens.push({ kind: "tag", name: match[1] });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    tokens.push({ kind: "text", value: text.slice(lastIndex) });
+  }
+  return tokens;
+}
 
 /**
  * The TextToolkit component
@@ -37,72 +65,24 @@ export interface TextToolkitProps extends Omit<TextProps, "text" | "onPress"> {
  * />
  */
 export const TextToolkit = ({ text, links, ...textProps }: TextToolkitProps) => {
-  // RegEx to split on {tag}, capturing the tag names
-  const pattern = /\{([^}]+)\}/g;
-
-  // Array to hold React elements
-  const elements: React.ReactNode[] = [];
-
-  // Current index in the string
-  let lastIndex = 0;
-  let match;
-  let idx = 0;
-
-  // Iterate over all matches
-  while ((match = pattern.exec(text)) !== null) {
-    // Text before this match
-    if (match.index > lastIndex) {
-      const before = text.slice(lastIndex, match.index);
-      elements.push(
-        <Text key={`text-${idx}`} text={before} {...textProps} />
-      );
-      idx++;
-    }
-
-    const tag = match[1];
-
-    const linkConfig = links[tag];
-    if (linkConfig) {
-      // separate elements for discriminated union type
-      if (linkConfig.type === "settings") {
-        elements.push(
-          <TextLink
-            key={`link-${idx}`}
-            text={linkConfig.text}
-            type={linkConfig.type}
-            value={undefined as never}
-            style={linkConfig.style}
-          />
-        );
-      } else {
-        elements.push(
-          <TextLink
-            key={`link-${idx}`}
-            text={linkConfig.text}
-            type={linkConfig.type}
-            value={linkConfig.value}
-            style={linkConfig.style}
-          />
-        );
-      }
-    } else {
-      // If the tag is not found, show as plain text with braces
-      elements.push(
-        <Text key={`text-${idx}`} text={`{${tag}}`} {...textProps} />
-      );
-    }
-    idx++;
-    lastIndex = match.index + match[0].length;
-  }
-
-  // Add any remaining text after last tag
-  if (lastIndex < text.length) {
-    elements.push(
-      <Text key={`text-${idx}`} text={text.slice(lastIndex)} {...textProps} />
-    );
-  }
+  const tokens = useMemo(() => tokenize(text), [text]);
 
   // Plain RNText wrapper avoids theme color cascading to links
-  return <RNText style={textProps.style}>{elements}</RNText>;
-};
+  return (
+    <RNText style={textProps.style}>
+      {tokens.map((token, idx) => {
+        if (token.kind === "text") {
+          return <Text key={idx} text={token.value} {...textProps} />;
+        }
 
+        const linkConfig = links[token.name];
+        if (!linkConfig) {
+          // Unknown tag: show it literally, braces included.
+          return <Text key={idx} text={`{${token.name}}`} {...textProps} />;
+        }
+
+        return <TextLink key={idx} {...linkConfig} />;
+      })}
+    </RNText>
+  );
+};

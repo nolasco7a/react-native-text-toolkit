@@ -2,8 +2,6 @@ import { Text } from "./text";
 import { Linking, StyleProp, TextStyle } from "react-native";
 
 export type TextLinkProps = {
-  /** The key of the link */
-  key?: string;
   /** The text to display */
   text: string;
   /** The type of the link */
@@ -19,7 +17,7 @@ export type TextLinkProps = {
         }
       | {
       type: "settings";
-      value: never;
+      value?: never;
     }
   )
 
@@ -48,12 +46,8 @@ export type TextLinkProps = {
  * // Open device settings
  * <TextLink text="Open settings" type="settings" />
  */
-export const TextLink = ({
-  text,
-  type,
-  value,
-  style,
-}: TextLinkProps) => {
+export const TextLink = (props: TextLinkProps) => {
+  const { text, style } = props;
 
   const handleOpenSettings = async () => {
     await Linking.openSettings();
@@ -91,22 +85,22 @@ export const TextLink = ({
     }
   }
 
-  const handleAction = (action: TextLinkProps["type"]) => {
-    switch (action) {
+  const handleAction = () => {
+    switch (props.type) {
       case "settings":
         void handleOpenSettings();
         break;
       case "url":
-        void handleOpenUrl(value);
+        void handleOpenUrl(props.value);
         break;
       case "email":
-        void handleOpenEmail(value);
+        void handleOpenEmail(props.value);
         break;
       case "phone":
-        void handleOpenPhone(value);
+        void handleOpenPhone(props.value);
         break;
       case "sms":
-        void handleOpenSms(value);
+        void handleOpenSms(props.value);
         break;
       default:
         break;
@@ -115,7 +109,7 @@ export const TextLink = ({
 
   return (
     <Text
-      onPress={() => handleAction(type)}
+      onPress={handleAction}
       style={[defaultLinkStyle, style]}
       text={text}
     />
